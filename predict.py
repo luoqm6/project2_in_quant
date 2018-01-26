@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+__author__ = 'luoqm6'
+__date__ = '18-1-26 17:38 p.m'
+
 import argparse
 from engine.model_engine import ModelEngine
 from galaxy.indicator_galaxy import IndicatorGalaxy

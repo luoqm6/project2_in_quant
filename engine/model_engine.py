@@ -1,15 +1,18 @@
+# -*- coding: utf-8 -*-
+__author__ = 'luoqm6'
+__date__ = '18-1-26 17:38 p.m'
+
 from sklearn import preprocessing
 from sklearn.neural_network import MLPRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn import svm
 from sklearn import neighbors
-from sklearn import tree
 import pandas as pd
 import matplotlib.pyplot as plt
 from pandas import DataFrame
-import sklearn.metrics as mtc
 from sklearn.metrics import mean_squared_error
 import numpy as np
+
 
 class ModelEngine:
 
@@ -53,6 +56,11 @@ class ModelEngine:
         self.ylabel_array = np.array(self.dtframe[self.ylabel_name])
         self.y_ori_array = self.ylabel_array
         self.ylabel_array = self.ylabel_array[self.duration:-50]
+
+        # 
+        # min_max_scaler = preprocessing.MinMaxScaler()
+        # self.y_ori_array = min_max_scaler.fit_transform(self.y_ori_array)
+        # self.ylabel_array = min_max_scaler.fit_transform(self.ylabel_array)
         return self.ylabel_array
 
     def set_duration(self, duration = 1):
@@ -85,9 +93,10 @@ class ModelEngine:
             tmpxattri.append(np.mean(tmparray, axis=0))  # mean of the columns as a row
         self.xattri_array = tmpxattri[:-50]
         self.xpre_array = tmpxattri[50:]
-        min_max_scaler = preprocessing.MinMaxScaler()
+        
         #   n
         # normalization
+        min_max_scaler = preprocessing.MinMaxScaler()
         self.xattri_array = min_max_scaler.fit_transform(self.xattri_array)
         self.xpre_array = min_max_scaler.fit_transform(self.xpre_array)
         # print(self.xattri_array[-5:])
@@ -174,12 +183,16 @@ class ModelEngine:
             
         clf.fit(xattri_array, ylabel_array)
         self.predict_result = clf.predict(xpre_array)
+        # min_max_scaler = preprocessing.MinMaxScaler()
+        # self.y_ori_array = min_max_scaler.fit_transform(self.y_ori_array)
+        # self.predict_result = min_max_scaler.fit_transform(self.predict_result)
         return self.predict_result
 
     def get_error(self):
         """
         calculate the mean squared error between the y and predict result
         """
+        
         mean_err = mean_squared_error(self.y_ori_array[self.duration+50:], self.predict_result)
         return mean_err
 

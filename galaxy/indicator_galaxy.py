@@ -1,13 +1,16 @@
+# -*- coding: utf-8 -*-
+__author__ = 'luoqm6'
+__date__ = '18-1-26 17:38 p.m'
+
 import datetime as dt
 import numpy as np
 import pandas as pd
-import datetime as dt
+
 
 class IndicatorGalaxy:
 
     def __init__(self):
         self.xattri_array = None
-        
         
     def load_CSV(self, path):
         """
