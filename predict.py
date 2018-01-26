@@ -46,13 +46,13 @@ if __name__ == "__main__":
     pre.set_ylabel_array(args.target)
     pre.set_xattri_array(pre.colHead)
     
-    result = pre.predict_fit(args.model_name)
+    result = pre.predict_fit(pre.get_xattri_array(), pre.get_ylabel_array(), pre.get_xpre_array(), args.model_name)
     pre.plot_predict()
     pre.compare_model()
 
     # #read the csv to dataframe
     # indtr = IndicatorGalaxy()
-    # indtr.load_CSV("D:/code/python_code/1day/000001.csv")
+    # indtr.load_CSV("D:/code/python_code/project2_in_quant/1day/000001.csv")
 
     # # add some indicator
     # indtr.add_col_mean('p_change')

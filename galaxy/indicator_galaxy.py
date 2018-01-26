@@ -220,3 +220,26 @@ class IndicatorGalaxy:
         
     def get_colHead(self):
         return self.colHead
+
+
+
+if __name__ == "__main__":
+
+    #read the csv to dataframe
+    indtr = IndicatorGalaxy()
+    indtr.load_CSV("D:/code/python_code/project2_in_quant/1day/000001.csv")
+
+    # add some indicator
+    indtr.add_col_mean('p_change')
+    indtr.add_EMA('p_change')
+    indtr.add_DIF('p_change')
+    indtr.add_MACD('p_change')
+    indtr.add_col_mean('volume')
+    indtr.add_EMA('volume')
+    indtr.add_DIF('volume')
+    indtr.add_MACD('volume')
+    
+    
+    
+    
+    

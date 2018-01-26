@@ -51,7 +51,7 @@ class ModelEngine:
         """
         self.set_ylabel(ylabelname)
         self.ylabel_array = np.array(self.dtframe[self.ylabel_name])
-        self.ylabel_array = self.ylabel_array[self.duration:]
+        self.ylabel_array = self.ylabel_array[self.duration:-1]
         return self.ylabel_array
 
     def set_duration(self, duration = 1):
@@ -84,8 +84,6 @@ class ModelEngine:
             tmpxattri.append(np.mean(tmparray, axis=0))  # mean of the columns as a row
         self.xattri_array = tmpxattri[:-1]
         self.xpre_array = tmpxattri[1:]
-        self.xattri_array = tmpxattri
-        self.xpre_array = tmpxattri
         min_max_scaler = preprocessing.MinMaxScaler()
         #   n
         # normalization
@@ -95,100 +93,87 @@ class ModelEngine:
         # print(self.xpre_array[-5:])
         return self.xattri_array
 
-    def NN_predict(self, xattri_array, ylabel_array, xpre_array):
+    def NN_predict(self, hidden_layer_sizes = 50):
         """
-        predict by the NuetrualNetwork model
-        @param: the x train array
-        @param: the y train array
-        @param: the x predict array
+            predict by the NuetrualNetwork model
+            @param hidden_layer_sizes: as it means
+
         """
-        neural_network = MLPRegressor(hidden_layer_sizes=(50,), activation='relu', solver='adam',
+        neural_network = MLPRegressor(hidden_layer_sizes=(hidden_layer_sizes,), activation='relu', solver='adam',
             alpha=0.0001, batch_size='auto', learning_rate='adaptive', learning_rate_init=0.001)
-        neural_network.fit(self.xattri_array, self.ylabel_array)
-        result = neural_network.predict(xpre_array)
-        return result
+        return neural_network
     
-    def LinR_predict(self, xattri_array, ylabel_array, xpre_array):
+    def LinR_predict(self):
         """
-        predict by the Linearregression model
-        @param: the x train array
-        @param: the y train array
-        @param: the x predict array
+            predict by the Linearregression model
         """
         lin_reg = LinearRegression()
-        lin_reg.fit(xattri_array, ylabel_array)
-        result = lin_reg.predict(xpre_array)
-        return result
+        return lin_reg
 
-    def SVM_predict(self, xattri_array, ylabel_array, xpre_array):
+    def SVM_predict(self):
         """
-        predict by the SVM model
-        @param: the x train array
-        @param: the y train array
-        @param: the x predict array
+            predict by the SVM model
+            @param 
         """
         clf = svm.SVR()
-        clf.fit(xattri_array, ylabel_array)
-        result = clf.predict(xpre_array)
-        return result
+        return clf
 
-    def KNN_predict(self, xattri_array, ylabel_array, xpre_array):
+    def KNN_predict(self, n_neighbors=5):
         """
-        predict by the KNN model
-        @param: the x train array
-        @param: the y train array
-        @param: the x predict array
+            predict by the KNN model
+            @param n_neighbors: the number of K
         """
-        KNN_clf = neighbors.KNeighborsRegressor(n_neighbors=5)
-        KNN_clf.fit(xattri_array, ylabel_array)
-        result = KNN_clf.predict(xpre_array)
-        return result
+        KNN_clf = neighbors.KNeighborsRegressor(n_neighbors=n_neighbors)
+        return KNN_clf
 
-    def RNN_predict(self, xattri_array, ylabel_array, xpre_array):
+    def RNN_predict(self, rad = 1.0):
         """
-        predict by the RNN model
-        @param: the x train array
-        @param: the y train array
-        @param: the x predict array
+            predict by the RNN model
+            @param rad:the radius of the RNN
         """
-        RNN_clf = neighbors.RadiusNeighborsRegressor(radius=1.0)
-        RNN_clf.fit(xattri_array, ylabel_array)
-        result = RNN_clf.predict(xpre_array)
-        return result
+        RNN_clf = neighbors.RadiusNeighborsRegressor(radius=rad)
+        return RNN_clf
 
-    def predict_fit(self, model_name = 'Linearregression', ):
+    def predict_fit(self,  xattri_array, ylabel_array, xpre_array, model_name = 'Linearregression'):
         """
-        This function fits the model
-        @param model_name:the model used to predict
-        return the result array
+            This function fits the model
+            @param model_name:the model used to predict
+            return the result array
         """
         # if self.xattri_array.all() == None or self.ylabel_array.all() == None:
         #     print("set xattri_array and ylabel_array first")
         self.set_model_name(model_name)
+        clf = LinearRegression()
         if model_name == self.model_name_list[1]:
             print(self.model_name)
-            self.predict_result = self.NN_predict(self.xattri_array, self.ylabel_array, self.xpre_array)
-            return self.predict_result
+            # hidden_layer_sizes = input("Please input the hidden layer sizes:")
+            clf = self.NN_predict(50)
+            
 
         elif model_name == self.model_name_list[0]:
             print(self.model_name)
-            self.predict_result = self.LinR_predict(self.xattri_array, self.ylabel_array, self.xpre_array)
-            return self.predict_result
+            clf = self.LinR_predict()
+            
 
         elif model_name == self.model_name_list[2]:
             print(self.model_name)
-            self.predict_result = self.SVM_predict(self.xattri_array, self.ylabel_array, self.xpre_array)
-            return self.predict_result 
+            clf = self.SVM_predict()
+             
 
         elif model_name == self.model_name_list[3]:
             print(self.model_name)
-            self.predict_result = self.KNN_predict(self.xattri_array, self.ylabel_array, self.xpre_array)
-            return self.predict_result
+            # n_neighbors = input("Please input the number of neighbors:")
+            clf = self.KNN_predict(10)
+            
         
         elif model_name == self.model_name_list[4]:
             print(self.model_name)
-            self.predict_result = self.RNN_predict(self.xattri_array, self.ylabel_array, self.xpre_array)
-            return self.predict_result
+            # radius = input("Please input the value of radius:")
+            clf = self.RNN_predict(1.0)
+            
+        clf.fit(xattri_array, ylabel_array)
+        self.predict_result = clf.predict(xpre_array)
+        return self.predict_result
 
     def get_error(self):
         """
@@ -199,9 +184,13 @@ class ModelEngine:
 
     ###########
     def compare_model(self):
+        """
+        This function compares the predict result of 
+            five model we offer in our ModelEngine
+        """
         errorlist = []
         for model in self.model_name_list:
-            self.predict_fit(model)
+            self.predict_fit(self.xattri_array, self.ylabel_array, self.xpre_array, model)
             err = self.get_error()
             errorlist.append(err)
             self.plot_predict(0,len(self.ylabel_array))
@@ -238,5 +227,25 @@ class ModelEngine:
     def get_xattri_array(self):
         return self.xattri_array
 
+    def get_ylabel_array(self):
+        return self.ylabel_array
+
     def get_xpre_array(self):
         return self.xpre_array
+
+if __name__ == "__main__":
+
+    #read the csv to dataframe
+    dtframe = pd.read_csv("D:/code/python_code/project2_in_quant/1day/000001.csv")
+    
+    # build the model and predict
+    pre = ModelEngine(dtframe)
+
+    # print(pre.get_xattri_array)
+    pre.set_duration(10)
+    pre.set_ylabel_array('close')
+    pre.set_xattri_array(pre.colHead[1:])
+    
+    result = pre.predict_fit(pre.get_xattri_array(), pre.get_ylabel_array(), pre.get_xpre_array(), 'Linearregression')
+    pre.plot_predict()
+    pre.compare_model()
