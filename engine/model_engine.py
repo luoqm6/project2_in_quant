@@ -51,7 +51,8 @@ class ModelEngine:
         """
         self.set_ylabel(ylabelname)
         self.ylabel_array = np.array(self.dtframe[self.ylabel_name])
-        self.ylabel_array = self.ylabel_array[self.duration:-1]
+        self.y_ori_array = self.ylabel_array
+        self.ylabel_array = self.ylabel_array[self.duration:-50]
         return self.ylabel_array
 
     def set_duration(self, duration = 1):
@@ -82,8 +83,8 @@ class ModelEngine:
             tmparray = self.xattri_array[i-self.duration:i]  # i+1???
             # print(DataFrame(tmparray))
             tmpxattri.append(np.mean(tmparray, axis=0))  # mean of the columns as a row
-        self.xattri_array = tmpxattri[:-1]
-        self.xpre_array = tmpxattri[1:]
+        self.xattri_array = tmpxattri[:-50]
+        self.xpre_array = tmpxattri[50:]
         min_max_scaler = preprocessing.MinMaxScaler()
         #   n
         # normalization
@@ -179,7 +180,7 @@ class ModelEngine:
         """
         calculate the mean squared error between the y and predict result
         """
-        mean_err = mean_squared_error(self.ylabel_array, self.predict_result)
+        mean_err = mean_squared_error(self.y_ori_array[self.duration+50:], self.predict_result)
         return mean_err
 
     ###########
@@ -207,11 +208,11 @@ class ModelEngine:
         err = self.get_error()
         print("The mean  error of model:"+self.model_name)
         print(err)
-        plt.plot(self.ylabel_array[begin:end], label=self.ylabel_name)
+        plt.plot(self.y_ori_array[self.duration+50:][begin:end], label=self.ylabel_name)
         plt.plot(self.predict_result[begin:end], label=self.ylabel_name+'_predict')
         plt.legend()
         plt.show()
-        plt.plot(self.ylabel_array[begin:end]-self.predict_result[begin:end], label='error')
+        plt.plot(self.y_ori_array[self.duration+50:][begin:end]-self.predict_result[begin:end], label='error')
         plt.legend()
         plt.show()
 
