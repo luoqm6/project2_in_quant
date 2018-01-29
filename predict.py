@@ -5,11 +5,17 @@ __date__ = '18-1-26 17:38 p.m'
 import argparse
 from engine.model_engine import ModelEngine
 from galaxy.indicator_galaxy import IndicatorGalaxy
+from fastresearchdata.fast_research_data import FastResearchData
 
 if __name__ == "__main__":
 
     # argparse from the command line
     parser = argparse.ArgumentParser()
+    parser.add_argument("-i", 
+                        "--stockID", 
+                        type=str, 
+                        default="000001", 
+                        help="the directory of the .csv file.")
     parser.add_argument("-p", 
                         "--path", 
                         type=str, 
@@ -32,27 +38,38 @@ if __name__ == "__main__":
                         help="the target column you want to predict such as p_change.")
     args = parser.parse_args()
 
+    stockIDList = []
+    stockIDList.append(args.stockID)
+
+    fileNamesList = []
+    fileNamesList.append(args.path)
+
     # read the csv to dataframe
+    frdata = FastResearchData()
+    frdata.loadFromCSV(stockIDList,fileNamesList)
+
+
+    # 
     indtr = IndicatorGalaxy()
-    indtr.load_CSV(args.path)
+    indtr.loadDataframe(frdata.getDataFrame(stockIDList[0]))
 
     # add some indicator
-    indtr.add_col_mean(args.col_name)
-    indtr.add_EMA(args.col_name)
-    indtr.add_DIF(args.col_name)
-    indtr.add_MACD(args.col_name)
+    indtr.addColMean(args.col_name)
+    indtr.addEMA(args.col_name)
+    indtr.addDIF(args.col_name)
+    indtr.addMACD(args.col_name)
     
     # build the model and predict
-    pre = ModelEngine(indtr.get_dtframe())
+    pre = ModelEngine(indtr.getDtframe())
 
     # print(pre.get_xattri_array)
-    pre.set_duration(10)
-    pre.set_ylabel_array(args.target)
-    pre.set_xattri_array(pre.colHead)
+    pre.setDuration(10)
+    pre.setYLabelArray(args.target)
+    pre.setXAttriArray(pre.colHead)
     
-    result = pre.predict_fit(pre.get_xattri_array(), pre.get_ylabel_array(), pre.get_xpre_array(), args.model_name)
-    pre.plot_predict()
-    pre.compare_model()
+    result = pre.predictFit(pre.getXAttriArray(), pre.getYLabelArray(), pre.getXPreArray(), args.model_name)
+    pre.plotPredict()
+    pre.compareModel()
 
     # #read the csv to dataframe
     # indtr = IndicatorGalaxy()
@@ -74,7 +91,7 @@ if __name__ == "__main__":
     # # print(pre.get_xattri_array)
     # pre.set_duration(10)
     # pre.set_ylabel_array('close')
-    # pre.set_xattri_array(pre.colHead)
+    # pre.setXAttriArray(pre.colHead)
     
     # result = pre.predict_fit('Linearregression')
     # pre.plot_predict()

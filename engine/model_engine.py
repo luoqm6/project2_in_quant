@@ -26,7 +26,7 @@ class ModelEngine(object):
         self.model_name_list = ['Linearregression', 'NuetrualNetwork', 'SVM', 'KNN', 'RNN']
         self.duration = 1
 
-    def set_ylabel(self, ylabel_name = 'price_change'):
+    def setYLabel(self, ylabel_name = 'price_change'):
         """
         This function set the y train
         @param ylabel_name:the name of y train
@@ -37,7 +37,7 @@ class ModelEngine(object):
             self.ylabel_name = self.colHead[-1]
         return self.ylabel_name
 
-    def set_model_name(self, model_name ='Linearregression' ):
+    def setModelName(self, model_name ='Linearregression' ):
         """
         This function set the model to predict
         @param ylabel_name:the name of model to predict
@@ -47,15 +47,15 @@ class ModelEngine(object):
         else:
             self.model_name = self.model_name_list[1]
 
-    def set_ylabel_array(self, ylabelname = 'price_change'):
+    def setYLabelArray(self, ylabelname = 'price_change'):
         """
         set a column as the ylabel
         @param ylabel_name:the name of model to predict
         """
-        self.set_ylabel(ylabelname)
+        self.setYLabel(ylabelname)
         self.ylabel_array = np.array(self.dtframe[self.ylabel_name])
         self.y_ori_array = self.ylabel_array
-        self.ylabel_array = self.ylabel_array[self.duration:-50]
+        self.ylabel_array = self.ylabel_array[self.duration:-5]
 
         # 
         # min_max_scaler = preprocessing.MinMaxScaler()
@@ -63,7 +63,7 @@ class ModelEngine(object):
         # self.ylabel_array = min_max_scaler.fit_transform(self.ylabel_array)
         return self.ylabel_array
 
-    def set_duration(self, duration = 1):
+    def setDuration(self, duration = 1):
         """
         set the duratioin to cal the mean
         @param duration: duratioin to cal the mean
@@ -73,7 +73,7 @@ class ModelEngine(object):
         else:
             self.duration = 1
 
-    def set_xattri_array(self, xattri_name_list):
+    def setXAttriArray(self, xattri_name_list):
         """
         set the xattri_array with strategy that find mean from the previous duration 
         @param: list name of x train
@@ -91,8 +91,8 @@ class ModelEngine(object):
             tmparray = self.xattri_array[i-self.duration:i]  # i+1???
             # print(DataFrame(tmparray))
             tmpxattri.append(np.mean(tmparray, axis=0))  # mean of the columns as a row
-        self.xattri_array = tmpxattri[:-50]
-        self.xpre_array = tmpxattri[50:]
+        self.xattri_array = tmpxattri[:-5]
+        self.xpre_array = tmpxattri[5:]
         
         #   n
         # normalization
@@ -103,7 +103,7 @@ class ModelEngine(object):
         # print(self.xpre_array[-5:])
         return self.xattri_array
 
-    def NN_predict(self, hidden_layer_sizes = 50):
+    def NNPredict(self, hidden_layer_sizes = 50):
         """
             predict by the NuetrualNetwork model
             @param hidden_layer_sizes: as it means
@@ -113,7 +113,7 @@ class ModelEngine(object):
             alpha=0.0001, batch_size='auto', learning_rate='adaptive', learning_rate_init=0.001)
         return neural_network
     
-    def LinR_predict(self):
+    def LinRPredict(self):
         """
             predict by the Linearregression model
         """
@@ -128,7 +128,7 @@ class ModelEngine(object):
         clf = svm.SVR()
         return clf
 
-    def KNN_predict(self, n_neighbors=5):
+    def KNNPredict(self, n_neighbors=5):
         """
             predict by the KNN model
             @param n_neighbors: the number of K
@@ -136,7 +136,7 @@ class ModelEngine(object):
         KNN_clf = neighbors.KNeighborsRegressor(n_neighbors=n_neighbors)
         return KNN_clf
 
-    def RNN_predict(self, rad = 1.0):
+    def RNNPredict(self, rad = 1.0):
         """
             predict by the RNN model
             @param rad:the radius of the RNN
@@ -144,7 +144,7 @@ class ModelEngine(object):
         RNN_clf = neighbors.RadiusNeighborsRegressor(radius=rad)
         return RNN_clf
 
-    def predict_fit(self,  xattri_array, ylabel_array, xpre_array, model_name = 'Linearregression'):
+    def predictFit(self,  xattri_array, ylabel_array, xpre_array, model_name = 'Linearregression'):
         """
             This function fits the model
             @param model_name:the model used to predict
@@ -152,17 +152,17 @@ class ModelEngine(object):
         """
         # if self.xattri_array.all() == None or self.ylabel_array.all() == None:
         #     print("set xattri_array and ylabel_array first")
-        self.set_model_name(model_name)
+        self.setModelName(model_name)
         clf = LinearRegression()
         if model_name == self.model_name_list[1]:
             print(self.model_name)
             # hidden_layer_sizes = input("Please input the hidden layer sizes:")
-            clf = self.NN_predict(50)
+            clf = self.NNPredict(50)
             
 
         elif model_name == self.model_name_list[0]:
             print(self.model_name)
-            clf = self.LinR_predict()
+            clf = self.LinRPredict()
             
 
         elif model_name == self.model_name_list[2]:
@@ -173,13 +173,13 @@ class ModelEngine(object):
         elif model_name == self.model_name_list[3]:
             print(self.model_name)
             # n_neighbors = input("Please input the number of neighbors:")
-            clf = self.KNN_predict(10)
+            clf = self.KNNPredict(10)
             
         
         elif model_name == self.model_name_list[4]:
             print(self.model_name)
             # radius = input("Please input the value of radius:")
-            clf = self.RNN_predict(1.0)
+            clf = self.RNNPredict(1.0)
             
         clf.fit(xattri_array, ylabel_array)
         self.predict_result = clf.predict(xpre_array)
@@ -188,77 +188,77 @@ class ModelEngine(object):
         # self.predict_result = min_max_scaler.fit_transform(self.predict_result)
         return self.predict_result
 
-    def get_error(self):
+    def getError(self):
         """
         calculate the mean squared error between the y and predict result
         """
-        mean_err = mean_squared_error(self.y_ori_array[self.duration+50:], self.predict_result)
+        mean_err = mean_squared_error(self.y_ori_array[self.duration+5:], self.predict_result)
         return mean_err
 
     ###########
-    def compare_model(self):
+    def compareModel(self):
         """
         This function compares the predict result of 
             five model we offer in our ModelEngine
         """
         errorlist = []
         for model in self.model_name_list:
-            self.predict_fit(self.xattri_array, self.ylabel_array, self.xpre_array, model)
-            err = self.get_error()
+            self.predictFit(self.xattri_array, self.ylabel_array, self.xpre_array, model)
+            err = self.getError()
             errorlist.append(err)
-            self.plot_predict(0,len(self.ylabel_array))
+            self.plotPredict(0,len(self.ylabel_array))
         errframe = DataFrame(errorlist)
         errframe.plot(kind = 'bar')
         plt.show()
 
-    def plot_predict(self, begin=0, end = -1):
+    def plotPredict(self, begin=0, end = -1):
         """
         This function plot the result of the predict
         @param begin: start of the index to draw on graph
         @param end: the last index to draw on graph
         """
-        err = self.get_error()
+        err = self.getError()
         print("The mean  error of model:"+self.model_name)
         print(err)
-        plt.plot(self.y_ori_array[self.duration+50:][begin:end], label=self.ylabel_name)
+        plt.plot(self.y_ori_array[self.duration+5:][begin:end], label=self.ylabel_name)
         plt.plot(self.predict_result[begin:end], label=self.ylabel_name+'_predict')
         plt.legend()
         plt.show()
-        plt.plot(self.y_ori_array[self.duration+50:][begin:end]-self.predict_result[begin:end], label='error')
+        plt.plot(self.y_ori_array[self.duration+5:][begin:end]-self.predict_result[begin:end], label='error')
         plt.legend()
         plt.show()
 
-    def get_colHead(self):
+    def getColHead(self):
         return self.colHead
     
-    def get_model_name(self):
+    def getModelName(self):
         return self.model_name
 
-    def get_model_name_list(self):
+    def getModelNameList(self):
         return self.model_name_list
 
-    def get_xattri_array(self):
+    def getXAttriArray(self):
         return self.xattri_array
 
-    def get_ylabel_array(self):
+    def getYLabelArray(self):
         return self.ylabel_array
 
-    def get_xpre_array(self):
+    def getXPreArray(self):
         return self.xpre_array
 
 if __name__ == "__main__":
 
     #read the csv to dataframe
-    dtframe = pd.read_csv("D:/code/python_code/project2_in_quant/1day/000001.csv")
+    dtframe = pd.read_csv("D:/code/python_code/project2_in_quant/data/1day/000001.csv")
     
     # build the model and predict
     pre = ModelEngine(dtframe)
 
-    # print(pre.get_xattri_array)
-    pre.set_duration(10)
-    pre.set_ylabel_array('close')
-    pre.set_xattri_array(pre.colHead[1:])
+    # print(pre.getXattriArray)
+    pre.setDuration(10)
+    pre.setYLabelArray('close')
+    pre.setXAttriArray(pre.colHead[1:])
     
-    result = pre.predict_fit(pre.get_xattri_array(), pre.get_ylabel_array(), pre.get_xpre_array(), 'Linearregression')
-    pre.plot_predict()
-    pre.compare_model()
+    result = pre.predictFit(pre.getXattriArray(), pre.getYLabelArray(), pre.getXPreArray(), 'Linearregression')
+    pre.plotPredict()
+    pre.compareModel()

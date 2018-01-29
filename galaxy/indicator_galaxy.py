@@ -12,17 +12,17 @@ class IndicatorGalaxy(object):
     def __init__(self):
         self.xattri_array = None
         
-    def load_CSV(self, path):
+    def loadCSV(self, path):
         """
         This function load the data in csv file 
         @param path:the path of the csv file
         """
         dtframe = pd.read_csv(path)
-        load_dataframe(dtframe)
+        self.loadDataframe(dtframe)
         
         #####
 
-    def load_dataframe(self,dtframe):
+    def loadDataframe(self, dtframe):
         """
         This function load the data in DataFrame directly 
         @param path:the DataFrame variable
@@ -33,19 +33,19 @@ class IndicatorGalaxy(object):
         # print (self.dtframe)
         date = self.dtframe[self.colHead[0]][0]
         if date.find(':') == -1:
-            self.dtframe = self.div_date(self.dtframe)
+            self.dtframe = self.divDate(self.dtframe)
             self.colHead = self.dtframe.columns.values.tolist()
             self.dtframe = self.dtframe.sort_values(by=self.colHead[0:3], ascending= True)
             #print(self.colHead[0:3])
-            self.del_columns(self.colHead[0:3])
+            self.delColumns(self.colHead[0:3])
         else:
-            self.dtframe = self.div_time(self.dtframe)
+            self.dtframe = self.divTime(self.dtframe)
             self.colHead = self.dtframe.columns.values.tolist()
             self.dtframe = self.dtframe.sort_values(by=self.colHead[0:6], ascending= True)
             #print(self.colHead[0:6])
-            self.del_columns(self.colHead[0:6])
+            self.delColumns(self.colHead[0:6])
     
-    def div_date(self, dtframe):
+    def divDate(self, dtframe):
         """
         This function divdes the date to 'year', 'month', 'day'
         @param dtframe :the dtframe has date columns
@@ -70,7 +70,7 @@ class IndicatorGalaxy(object):
             result = pd.concat([date_frame, dtframe], axis=1)
             return result
 
-    def div_time(self, data):
+    def divTime(self, data):
         """
         This function divdes the date to 'year','month','day','hour','minute','second'
         @param dtframe :the dtframe has date columns
@@ -98,7 +98,7 @@ class IndicatorGalaxy(object):
             result = pd.concat([date_frame, data], axis=1)
             return result
 
-    def del_columns(self, collist):
+    def delColumns(self, collist):
         """
         This function delete the columns when thier name in the collist
         @param collist:The name of the list wants to delete
@@ -110,7 +110,7 @@ class IndicatorGalaxy(object):
                 print(col+" does not exist")
         #print (self.dtframe)
 
-    def select_columns(self,collist):
+    def selectColumns(self,collist):
         """
         This function select the columns when thier name in the collist
         @param collist:The list of the list wants to select
@@ -125,7 +125,7 @@ class IndicatorGalaxy(object):
         return self.dtframe[collist]
         
 
-    def get_col_mean(self, col_name, interval=1):
+    def getColMean(self, col_name, interval=1):
         """
         add the mean of the columns with interval to dtframe
         @param col_name: 
@@ -147,16 +147,16 @@ class IndicatorGalaxy(object):
             #print(new_col[i])
         return new_col
 
-    def add_col_mean(self, col_name, interval=1):
+    def addColMean(self, col_name, interval=1):
         """
         calculate the column's mean with interval, and add to the DataFrame
         @param col_name:the name of the column
         @param interval:the interval to calculate the mean
         """
-        self.dtframe[col_name+'_avg'] = self.get_col_mean(col_name, interval)
+        self.dtframe[col_name+'_avg'] = self.getColMean(col_name, interval)
         #print(self.dtframe)
 
-    def get_EMA(self,col_name):
+    def getEMA(self,col_name):
         """
         calculate EMA of a column
         @param col_name:name of the column
@@ -179,44 +179,44 @@ class IndicatorGalaxy(object):
             self.EMA26.append(2/27*tday + 25/27*yd26)
         return self.EMA12,self.EMA26
         
-    def add_EMA(self, col_name = 'close'):
+    def addEMA(self, col_name = 'close'):
         """
         This function add the EMA12 and EMA26 to the DataFrame
         @param col_name: name of the column to calculate EMA
         """
-        self.get_EMA(col_name)
+        self.getEMA(col_name)
         self.dtframe[col_name+'_EMA12'] = self.EMA12
         self.dtframe[col_name+'_EMA26'] = self.EMA26
         return self.dtframe
 
-    def get_DIF(self, col_name = 'close'):
+    def getDIF(self, col_name = 'close'):
         """
         compute DIFF bitween EMA(12) & EMA(16)
         DIFF = EMA(12) - EMA(26)
         @param col_name:the column's name 
         """
-        EMA12,EMA26 = self.get_EMA(col_name)
+        EMA12,EMA26 = self.getEMA(col_name)
         self.DIF = []
         self.DIF.append(EMA12[0])
         for i in range(1,len(EMA12)):
             self.DIF.append(EMA12[i] - EMA26[i])
         return self.DIF
     
-    def add_DIF(self, col_name = 'close'):
+    def addDIF(self, col_name = 'close'):
         """
         This function add the DIF to the DataFrame
         @param col_name: name of the column to calculate DIF
         """
-        self.get_DIF(col_name)
+        self.getDIF(col_name)
         self.dtframe[col_name+'_DIF'] = self.DIF
         return self.dtframe
 
-    def get_MACD(self,col_name = 'close'):
+    def getMACD(self,col_name = 'close'):
         """
         compute MACD(DEA)
         DEA(MACD) = DEA * 8/10 + DIF * 2/10
         """
-        DIF = self.get_DIF(col_name)
+        DIF = self.getDIF(col_name)
         DEA = []
 
         DEA.append(DIF[0])
@@ -228,19 +228,19 @@ class IndicatorGalaxy(object):
             self.MACD.append(2*(DIF[i]-DEA[i]))
         return self.MACD
     
-    def add_MACD(self, col_name = 'close'):
+    def addMACD(self, col_name = 'close'):
         """
         This function add the MACD to the DataFrame
         @param col_name: name of the column to calculate MACD
         """
-        self.get_MACD(col_name)
+        self.getMACD(col_name)
         self.dtframe[col_name+'_MACD'] = self.MACD
         return self.dtframe
 
-    def get_dtframe(self):
+    def getDtframe(self):
         return self.dtframe
         
-    def get_colHead(self):
+    def getColHead(self):
         return self.colHead
 
 
@@ -248,17 +248,17 @@ if __name__ == "__main__":
 
     #read the csv to dataframe
     indtr = IndicatorGalaxy()
-    indtr.load_CSV("D:/code/python_code/project2_in_quant/data/1day/000001.csv")
+    indtr.loadCSV("D:/code/python_code/project2_in_quant/data/1day/000001.csv")
 
     # add some indicator
-    indtr.add_col_mean('p_change')
-    indtr.add_EMA('p_change')
-    indtr.add_DIF('p_change')
-    indtr.add_MACD('p_change')
-    indtr.add_col_mean('volume')
-    indtr.add_EMA('volume')
-    indtr.add_DIF('volume')
-    indtr.add_MACD('volume')
+    indtr.addColMean('p_change')
+    indtr.addEMA('p_change')
+    indtr.addDIF('p_change')
+    indtr.addMACD('p_change')
+    indtr.addColMean('volume')
+    indtr.addEMA('volume')
+    indtr.addDIF('volume')
+    indtr.addMACD('volume')
     
     
     
