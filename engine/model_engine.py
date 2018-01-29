@@ -14,7 +14,7 @@ from sklearn.metrics import mean_squared_error
 import numpy as np
 
 
-class ModelEngine:
+class ModelEngine(object):
 
     def __init__(self, dtframe):
         self.xattri_array = None
@@ -192,7 +192,6 @@ class ModelEngine:
         """
         calculate the mean squared error between the y and predict result
         """
-        
         mean_err = mean_squared_error(self.y_ori_array[self.duration+50:], self.predict_result)
         return mean_err
 

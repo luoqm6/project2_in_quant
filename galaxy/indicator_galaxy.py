@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 
-class IndicatorGalaxy:
+class IndicatorGalaxy(object):
 
     def __init__(self):
         self.xattri_array = None
@@ -17,9 +17,18 @@ class IndicatorGalaxy:
         This function load the data in csv file 
         @param path:the path of the csv file
         """
-        self.dtframe = pd.read_csv(path)
-        self.colHead = self.dtframe.columns.values.tolist()
-        self.dtframe = self.dtframe.sort_values(by=self.colHead[0])
+        dtframe = pd.read_csv(path)
+        load_dataframe(dtframe)
+        
+        #####
+
+    def load_dataframe(self,dtframe):
+        """
+        This function load the data in DataFrame directly 
+        @param path:the DataFrame variable
+        """
+        self.colHead = dtframe.columns.values.tolist()
+        self.dtframe = dtframe.sort_values(by=self.colHead[0])
         self.dtframe = self.dtframe.reset_index(drop=True)
         # print (self.dtframe)
         date = self.dtframe[self.colHead[0]][0]
@@ -35,8 +44,6 @@ class IndicatorGalaxy:
             self.dtframe = self.dtframe.sort_values(by=self.colHead[0:6], ascending= True)
             #print(self.colHead[0:6])
             self.del_columns(self.colHead[0:6])
-        
-        #####
     
     def div_date(self, dtframe):
         """
@@ -142,7 +149,7 @@ class IndicatorGalaxy:
 
     def add_col_mean(self, col_name, interval=1):
         """
-        calculate the column's mean with interval
+        calculate the column's mean with interval, and add to the DataFrame
         @param col_name:the name of the column
         @param interval:the interval to calculate the mean
         """
@@ -173,6 +180,10 @@ class IndicatorGalaxy:
         return self.EMA12,self.EMA26
         
     def add_EMA(self, col_name = 'close'):
+        """
+        This function add the EMA12 and EMA26 to the DataFrame
+        @param col_name: name of the column to calculate EMA
+        """
         self.get_EMA(col_name)
         self.dtframe[col_name+'_EMA12'] = self.EMA12
         self.dtframe[col_name+'_EMA26'] = self.EMA26
@@ -192,6 +203,10 @@ class IndicatorGalaxy:
         return self.DIF
     
     def add_DIF(self, col_name = 'close'):
+        """
+        This function add the DIF to the DataFrame
+        @param col_name: name of the column to calculate DIF
+        """
         self.get_DIF(col_name)
         self.dtframe[col_name+'_DIF'] = self.DIF
         return self.dtframe
@@ -214,6 +229,10 @@ class IndicatorGalaxy:
         return self.MACD
     
     def add_MACD(self, col_name = 'close'):
+        """
+        This function add the MACD to the DataFrame
+        @param col_name: name of the column to calculate MACD
+        """
         self.get_MACD(col_name)
         self.dtframe[col_name+'_MACD'] = self.MACD
         return self.dtframe
