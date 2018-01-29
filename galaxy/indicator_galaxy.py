@@ -230,7 +230,7 @@ if __name__ == "__main__":
 
     #read the csv to dataframe
     indtr = IndicatorGalaxy()
-    indtr.load_CSV("D:/code/python_code/project2_in_quant/1day/000001.csv")
+    indtr.load_CSV("D:/code/python_code/project2_in_quant/data/1day/000001.csv")
 
     # add some indicator
     indtr.add_col_mean('p_change')

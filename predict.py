@@ -13,7 +13,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", 
                         "--path", 
                         type=str, 
-                        default="D:/code/python_code/project2_in_quant/1day/000001.csv", 
+                        default="D:/code/python_code/project2_in_quant/data/1day/000001.csv", 
                         help="the directory of the .csv file.")
     parser.add_argument("-m",
                        "--model_name", 
