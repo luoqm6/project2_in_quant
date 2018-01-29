@@ -244,7 +244,6 @@ class IndicatorGalaxy(object):
         return self.colHead
 
 
-
 if __name__ == "__main__":
 
     #read the csv to dataframe
