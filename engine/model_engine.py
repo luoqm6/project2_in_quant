@@ -222,9 +222,11 @@ class ModelEngine(object):
         print(err)
         plt.plot(self.y_ori_array[self.duration+5:][begin:end], label=self.ylabel_name)
         plt.plot(self.predict_result[begin:end], label=self.ylabel_name+'_predict')
+        plt.title(self.model_name)
         plt.legend()
         plt.show()
         plt.plot(self.y_ori_array[self.duration+5:][begin:end]-self.predict_result[begin:end], label='error')
+        plt.title(self.model_name+' error')
         plt.legend()
         plt.show()
 
